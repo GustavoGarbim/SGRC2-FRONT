@@ -1,0 +1,154 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f3f4f6;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+header {
+  width: 100%;
+  height: 60px;
+  background-color: #1f2937;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  color: white;
+}
+
+#image img {
+  width: 45px;
+}
+
+.app-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+nav {
+  width: 190px;
+  background-color: #374151; 
+  height: 100%;
+}
+
+.content {
+  flex: 1;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  background-color: #059669;
+}
+
+#import-plan {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 20px;
+}
+
+.btn-import {
+  background-color: #10b981 !important;
+  border: none !important;
+  border-radius: 6px !important;
+  font-weight: bold !important;
+  color: white !important;
+  padding: 12px 24px !important;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-import:hover {
+  background-color: #059669 !important;
+}
+
+#dashboard {
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 25px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  width: 100%;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.dashboard-title {
+  font-size: 20px;
+  color: #111827;
+  font-weight: bold;
+}
+
+.tabela-contratos {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.p-datatable-thead > tr > th {
+  background-color: #f9fafb !important;
+  color: #4b5563 !important;
+  padding: 12px 15px !important;
+  text-align: left;
+  font-size: 14px;
+  border-bottom: 2px solid #e5e7eb !important;
+}
+
+.p-datatable-tbody > tr > td {
+  padding: 15px !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  font-size: 14px;
+}
+
+.p-datatable-tbody > tr:hover {
+  background-color: #f9fafb !important;
+  color: #111827;
+}
+
+.tag-ativo {
+  background-color: #d1fae5;
+  color: #065f46;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.tag-inativo {
+  background-color: #fee2e2;
+  color: #991b1b;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.btn-refresh, .p-button-secondary {
+  border: 1px solid #d1d5db !important;
+  background: white !important;
+  color: #374151 !important;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  cursor: pointer;
+}
+
+.btn-refresh:hover, .p-button-secondary:hover {
+  background-color: #f3f4f6 !important;
+}
