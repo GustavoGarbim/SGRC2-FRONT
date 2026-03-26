@@ -152,3 +152,76 @@ nav {
 .btn-refresh:hover, .p-button-secondary:hover {
   background-color: #f3f4f6 !important;
 }
+
+
+
+
+
+
+
+#header-actions {
+  display: flex;
+  gap: 15px; /* Espaço entre os botões */
+  margin-bottom: 25px;
+  align-items: center;
+}
+
+.btn-primary {
+  background-color: #3b82f6 !important; /* Azul moderno */
+  border: none !important;
+  border-radius: 6px !important;
+  font-weight: bold !important;
+  color: white !important;
+  padding: 10px 20px !important;
+  transition: 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: #2563eb !important;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding-top: 10px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
+}
+
+.form-group label {
+  font-weight: bold;
+  color: #374151;
+  font-size: 14px;
+}
+
+.form-group .p-inputtext,
+.form-group .p-dropdown,
+.form-group .p-inputnumber {
+  width: 100%;
+}
+
+.form-grid {
+  display: flex;
+  gap: 15px;
+  width: 100%;
+}
+
+.btn-export {
+  background-color: #217346 !important;
+  border: none !important;
+  border-radius: 6px !important;
+  font-weight: bold !important;
+  color: white !important;
+  padding: 10px 20px !important;
+  transition: 0.2s;
+}
+
+.btn-export:hover {
+  background-color: #1e6b40 !important;
+}
