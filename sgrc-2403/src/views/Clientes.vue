@@ -1,11 +1,7 @@
 <script setup>
-import './HomeView.css'
+import './Contratos.css'
 
-import AppHeader from '../components/layout/AppHeader.vue'
-import AppSidebar from '../components/layout/AppSidebar.vue'
 import ModalNovoCliente from '../components/clientes/ModalNovoCliente.vue'
-import ModalNovoContrato from '../components/contratos/ModalNovoContrato.vue'
-import ModalEditarContrato from '../components/contratos/ModalEditarContrato.vue'
 
 import 'primeicons/primeicons.css'
 import Button from 'primevue/button'
@@ -15,32 +11,24 @@ import Menu from 'primevue/menu'
 
 import { ref, onMounted, nextTick } from 'vue'
 
-import { formatarMoeda, formatarCnpj } from '../utils/formatadores'
-import { buscarTodosClientes, salvarNovoCliente } from '../services/clienteService'
+import { formatarCnpj } from '../utils/formatadores'
 import {
-  buscarTodosContratos,
-  salvarNovoContrato,
-  atualizarContrato,
-  alterarStatusContrato,
-  gerarPlanilhaExcel,
-  importarPlanilhaExcel,
-} from '../services/contratoService'
+  alterarStatusCliente,
+  buscarTodosClientes,
+  salvarNovoCliente,
+} from '../services/clienteService'
+import { gerarPlanilhaExcel, importarPlanilhaExcel } from '../services/clienteService'
 
-const contratos = ref([])
-const carregando = ref(false)
 const fileInput = ref(null)
 const importando = ref(false)
-const contratoSelecionado = ref(null)
 const menuAcoes = ref(null)
 const itensMenu = ref([])
+const clienteSelecionado = ref(null)
 
 const modalEditarVisivel = ref(false)
-const salvandoEdicao = ref(false)
 const modalClienteVisivel = ref(false)
-const modalContratoVisivel = ref(false)
 const listaClientes = ref([])
 const exportando = ref(false)
-const abaAtiva = ref('clientes')
 
 const formCliente = ref({
   razaoSocial: '',
@@ -49,38 +37,14 @@ const formCliente = ref({
   ativo: true,
 })
 
-const formContrato = ref({
-  clienteId: null,
-  numeroDocumento: '',
-  dataInicio: new Date(),
-  mesReajuste: 1,
-  indiceAplicado: 'IPCA',
-  valorAtual: 0,
-  ativo: true,
-})
-
 const formEdicao = ref({
   id: 0,
   razaoSocialCliente: '',
   cnpjCliente: '',
-  numeroDocumento: '',
-  indiceAplicado: '',
-  valorAtual: 0,
+  emailFinanceiro: '',
 })
 
 const carregarDados = async () => {
-  try {
-    carregando.value = true
-    contratos.value = await buscarTodosContratos()
-  } catch (err) {
-    console.error('Erro na requisição: ', err)
-    alert('Erro ao carregar dados. Verifique se o backend está rodando!')
-  } finally {
-    carregando.value = false
-  }
-}
-
-const carregarClientes = async () => {
   try {
     listaClientes.value = await buscarTodosClientes()
   } catch (error) {
@@ -92,7 +56,12 @@ const criarCliente = async () => {
   try {
     await salvarNovoCliente(formCliente.value)
     alert('Cliente criado com sucesso!')
-    formCliente.value = { razaoSocial: '', cnpj: '', emailFinanceiro: '', ativo: true }
+    formCliente.value = {
+      razaoSocial: '',
+      cnpj: '',
+      emailFinanceiro: '',
+      ativo: true,
+    }
     await carregarDados()
   } catch (error) {
     console.error('Erro ao criar cliente: ', error)
@@ -100,45 +69,9 @@ const criarCliente = async () => {
   }
 }
 
-const criarContrato = async () => {
+const alternarStatus = async (cliente) => {
   try {
-    if (!formContrato.value.clienteId) return alert('Por favor, selecione um cliente primeiro.')
-    await salvarNovoContrato(formContrato.value)
-    alert('Contrato criado com sucesso!')
-    formContrato.value = {
-      clienteId: null,
-      numeroDocumento: '',
-      dataInicio: new Date(),
-      mesReajuste: 1,
-      indiceAplicado: 'IPCA',
-      valorAtual: 0,
-      ativo: true,
-    }
-    await carregarDados()
-  } catch (error) {
-    console.error('Erro ao criar contrato:', error)
-    alert('Erro ao criar o contrato.')
-  }
-}
-
-const salvarEdicao = async () => {
-  salvandoEdicao.value = true
-  try {
-    await atualizarContrato(formEdicao.value.id, formEdicao.value)
-    alert('Contrato atualizado com sucesso!')
-    modalEditarVisivel.value = false
-    await carregarDados()
-  } catch (error) {
-    console.error('Erro na edição:', error)
-    alert('Erro ao salvar as alterações.')
-  } finally {
-    salvandoEdicao.value = false
-  }
-}
-
-const alternarStatus = async (contrato) => {
-  try {
-    await alterarStatusContrato(contrato.id, !contrato.ativo)
+    await alterarStatusCliente(cliente.id, !cliente.ativo)
     await carregarDados()
   } catch (error) {
     console.error('Erro ao alterar status: ', error)
@@ -155,7 +88,7 @@ const exportarPlanilha = async () => {
       const url = window.URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
-      link.setAttribute('download', 'Relatorio_Contratos_SGRC.xlsx')
+      link.setAttribute('download', 'Relatorio_Clientes_SGRC.xlsx')
       document.body.appendChild(link)
       link.click()
       link.remove()
@@ -193,24 +126,24 @@ const escolherArquivo = () => {
   fileInput.value.click()
 }
 
-const abrirMenu = async (event, contrato) => {
-  contratoSelecionado.value = contrato
+const abrirMenu = async (event, cliente) => {
+  clienteSelecionado.value = cliente
   itensMenu.value = [
     {
-      label: 'Editar Contrato',
+      label: 'Editar Cliente',
       icon: 'pi pi-pencil',
       command: () => {
-        formEdicao.value = { ...contrato }
+        formEdicao.value = { ...cliente }
         modalEditarVisivel.value = true
       },
     },
     {
-      label: contrato.ativo ? 'Desativar' : 'Ativar',
-      icon: contrato.ativo ? 'pi pi-trash' : 'pi pi-check',
+      label: cliente.ativo ? 'Desativar' : 'Ativar',
+      icon: cliente.ativo ? 'pi pi-trash' : 'pi pi-check',
       command: () => {
-        const acao = contrato.ativo ? 'desativar' : 'ativar'
-        if (confirm(`Deseja ${acao} o contrato ${contrato.id}?`)) {
-          alternarStatus(contrato)
+        const acao = cliente.ativo ? 'desativar' : 'ativar'
+        if (confirm(`Deseja ${acao} o cliente ${cliente.id}?`)) {
+          alternarStatus(cliente)
         }
       },
     },
@@ -221,16 +154,13 @@ const abrirMenu = async (event, contrato) => {
 
 onMounted(() => {
   carregarDados()
-  carregarClientes()
 })
 </script>
 
 <template>
   <main>
-    <AppHeader />
 
     <div class="app-body">
-      <AppSidebar :abaAtiva="abaAtiva" @mudarAba="abaAtiva = $event" />
 
       <section class="content">
         <div id="header-actions">
@@ -239,12 +169,6 @@ onMounted(() => {
             icon="pi pi-user-plus"
             class="btn-primary"
             @click="modalClienteVisivel = true"
-          />
-          <Button
-            label="Novo Contrato"
-            icon="pi pi-file-plus"
-            class="btn-primary"
-            @click="modalContratoVisivel = true"
           />
           <Button
             label="Importar Planilha"
@@ -272,7 +196,7 @@ onMounted(() => {
 
         <div id="dashboard">
           <div class="toolbar">
-            <h2 class="dashboard-title">Contratos Cadastrados</h2>
+            <h2 class="dashboard-title">Clientes Cadastrados</h2>
             <Button
               icon="pi pi-refresh"
               class="btn-refresh"
@@ -282,20 +206,17 @@ onMounted(() => {
             />
           </div>
 
-          <DataTable :value="contratos" class="tabela-contratos">
-            <Column field="razaoSocialCliente" header="Razão Social"></Column>
+          <DataTable :value="listaClientes" class="tabela-clientes">
+            <Column field="razaoSocial" header="Razão Social"></Column>
+
             <Column header="CNPJ">
               <template #body="slotProps">
-                {{ formatarCnpj(slotProps.data.cnpjCliente) }}
+                {{ formatarCnpj(slotProps.data.cnpj) }}
               </template>
             </Column>
-            <Column field="numeroDocumento" header="Documento"></Column>
-            <Column header="Valor Atual">
-              <template #body="slotsProps">
-                {{ formatarMoeda(slotsProps.data.valorAtual) }}
-              </template>
-            </Column>
-            <Column field="indiceAplicado" header="Indice"></Column>
+
+            <Column field="emailFinanceiro" header="Email financeiro"></Column>
+
             <Column header="Status">
               <template #body="slotProps">
                 <span :class="slotProps.data.ativo ? 'tag-ativo' : 'tag-inativo'">
@@ -303,6 +224,7 @@ onMounted(() => {
                 </span>
               </template>
             </Column>
+
             <Column header="Ações">
               <template #body="slotProps">
                 <Button
@@ -324,19 +246,12 @@ onMounted(() => {
       @salvar="criarCliente"
     />
 
-    <ModalNovoContrato
-      v-model:visible="modalContratoVisivel"
-      :formContrato="formContrato"
-      :listaClientes="listaClientes"
-      @salvar="criarContrato"
-    />
-
-    <ModalEditarContrato
-      v-model:visible="modalEditarVisivel"
-      :formEdicao="formEdicao"
-      :salvandoEdicao="salvandoEdicao"
-      @salvar="salvarEdicao"
-    />
+    <!-- <ModalEditarCliente
+        v-model:visible="modalEditarVisivel"
+        :formEdicao="formEdicao"
+        :salvandoEdicao="salvandoEdicao"
+        @salvar="salverEdicao"
+    /> -->
 
     <Menu ref="menuAcoes" :model="itensMenu" :popup="true" appendTo="body" />
   </main>
